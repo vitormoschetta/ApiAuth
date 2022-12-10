@@ -10,8 +10,8 @@ namespace Shared.Utils
             var hashed = KeyDerivation.Pbkdf2(
                                password: input,
                                salt: salt,
-                               prf: KeyDerivationPrf.HMACSHA1,
-                               iterationCount: 10000,
+                               prf: KeyDerivationPrf.HMACSHA256,
+                               iterationCount: 100000,
                                numBytesRequested: 256 / 8);
 
             return Convert.ToBase64String(hashed);
