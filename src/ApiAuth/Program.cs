@@ -16,31 +16,12 @@ builder.Services.AddSingleton<UserRepository>();
 builder.Services.AddSingleton<JwtServices>();
 
 SwaggerConfig();
+AuthenticationConfig();
 
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<AuthFilter>();
+    options.Filters.Add<AuthorizationFilter>();
 });
-
-var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key");
-var key = Encoding.ASCII.GetBytes(jwtKey);
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.RequireHttpsMetadata = false;
-        options.SaveToken = true;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
 
 var app = builder.Build();
 
@@ -93,4 +74,28 @@ void SwaggerConfig()
                         }
                     });
     });
+}
+
+
+void AuthenticationConfig()
+{
+    var jwtKey = builder?.Configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key");
+    var key = Encoding.ASCII.GetBytes(jwtKey);
+    builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false;
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+        });
 }

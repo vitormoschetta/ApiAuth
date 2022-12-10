@@ -6,43 +6,42 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ApiAuth.Filters
 {
-    public class AuthFilter : IAsyncAuthorizationFilter
+    public class AuthorizationFilter : IAsyncAuthorizationFilter
     {
         private readonly UserRepository _userRepository;
 
-        public AuthFilter(UserRepository userRepository)
+        public AuthorizationFilter(UserRepository userRepository)
         {
             _userRepository = userRepository;
         }
 
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
-            // verifica se a rota é pública (AllowAnonymous) e não precisa validar o token
+            // Verifica se a rota é pública (AllowAnonymous). Neste caso, não precisa validar o token.
             var endpoint = context.HttpContext.GetEndpoint();
-            var allowAnonymousAttributes = endpoint?.Metadata.GetOrderedMetadata<AllowAnonymousAttribute>() ?? Array.Empty<AllowAnonymousAttribute>();
-            if (allowAnonymousAttributes.Any())
+            var allowAnonymousAttributes = endpoint?.Metadata.GetOrderedMetadata<AllowAnonymousAttribute>();
+            if (allowAnonymousAttributes != null)
             {
                 await Task.CompletedTask;
                 return;
             }
 
-            // se chegou aqui, a rota não é pública, então precisa validar o token (se o usuário está autenticado)
-            if (!context.HttpContext.User.Identity.IsAuthenticated)
+            // Se a rota não for pública, verifica se o usuário está autenticado.
+            var user = context.HttpContext.User;
+            if (user.Identity == null || !user.Identity.IsAuthenticated)
             {
                 context.Result = new UnauthorizedResult();
                 return;
             }
 
-            // verificar se o usuário tem permissão para acessar a rota
-            endpoint = context.HttpContext.GetEndpoint();
-            var authorizeAttributes = endpoint?.Metadata.GetOrderedMetadata<AuthorizeAttribute>() ?? Array.Empty<AuthorizeAttribute>();
-
-            if (authorizeAttributes.Any())
+            // Verifica se o usuário tem permissão para acessar a rota.
+            var authorizeAttributes = endpoint?.Metadata.GetOrderedMetadata<AuthorizeAttribute>();
+            if (authorizeAttributes != null)
             {
                 var roles = authorizeAttributes.SelectMany(x => x.Roles?.Split(",").Select(y => y.Trim()) ?? Array.Empty<string>()).ToList();
                 if (roles.Any())
                 {
-                    var userRoles = context.HttpContext.User.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
+                    var userRoles = user.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
                     if (!userRoles.Any(x => roles.Contains(x)))
                     {
                         context.Result = new ForbidResult();

@@ -9,7 +9,7 @@ using Shared.Utils;
 namespace ApiAuth.Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]")]
+    [Route("api/[controller]")]
     [AllowAnonymous]
     public class AuthController : ControllerBase
     {

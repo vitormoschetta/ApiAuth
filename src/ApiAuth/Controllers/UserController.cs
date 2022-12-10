@@ -8,7 +8,7 @@ using Shared.Utils;
 namespace ApiAuth.Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]")]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly UserRepository _userRepository;
@@ -22,18 +22,15 @@ namespace ApiAuth.Controllers
         [Authorize(Roles = "admin")]
         public async Task<ActionResult<IEnumerable<User>>> Get()
         {
-            var username = User.Identity.Name;
-            var userIsInRole = User.IsInRole("admin");
-
             return Ok(await _userRepository.Get());
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{name}")]
         [Authorize(Roles = "user")]
-        public async Task<ActionResult<User>> GetById(Guid id)
+        public async Task<ActionResult<User>> GetByName(string name)
         {
-            var user = await _userRepository.GetById(id);
+            var user = await _userRepository.GetByUsername(name);
             if (user == null)
                 return NotFound();
 
@@ -41,11 +38,11 @@ namespace ApiAuth.Controllers
         }
 
 
-        [HttpGet("GetCurrentUser")]
+        [HttpGet("current")]
         [Authorize]
         public async Task<ActionResult<User>> GetCurrentUser()
         {
-            var username = User.Identity.Name;
+            var username = User.Identity?.Name ?? throw new Exception("User.Identity.Name is null");
             var user = await _userRepository.GetByUsername(username);
             if (user == null)
                 return NotFound();
@@ -56,7 +53,7 @@ namespace ApiAuth.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<ActionResult<User>> Create([FromBody] CreateUser request)
+        public async Task<ActionResult<User>> Create([FromBody] CreateUserRequest request)
         {
             var userExists = await _userRepository.GetByUsername(request.Username);
             if (userExists != null)

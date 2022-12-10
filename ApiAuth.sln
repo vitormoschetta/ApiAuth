@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiAuth", "src\ApiAuth\ApiA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "src\Shared\Shared.csproj", "{AC33168D-E0C1-49D4-AE08-13161A9FCB8B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BD1F9932-2E40-453D-9208-99E3EA099FD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiAuth.Test", "tests\ApiAuth.Test\ApiAuth.Test.csproj", "{9F0142A1-104F-487A-BA76-E4DBD3B2EA95}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +30,14 @@ Global
 		{AC33168D-E0C1-49D4-AE08-13161A9FCB8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC33168D-E0C1-49D4-AE08-13161A9FCB8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC33168D-E0C1-49D4-AE08-13161A9FCB8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F0142A1-104F-487A-BA76-E4DBD3B2EA95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F0142A1-104F-487A-BA76-E4DBD3B2EA95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F0142A1-104F-487A-BA76-E4DBD3B2EA95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F0142A1-104F-487A-BA76-E4DBD3B2EA95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BF0AA96B-E128-43A2-A874-C00D88C4BEFF} = {59874FCE-6C2A-4BDA-9F58-4E54A3E4F9AF}
 		{AC33168D-E0C1-49D4-AE08-13161A9FCB8B} = {59874FCE-6C2A-4BDA-9F58-4E54A3E4F9AF}
+		{9F0142A1-104F-487A-BA76-E4DBD3B2EA95} = {BD1F9932-2E40-453D-9208-99E3EA099FD5}
 	EndGlobalSection
 EndGlobal
