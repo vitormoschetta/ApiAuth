@@ -17,7 +17,7 @@ namespace ApiAuth.Controllers
         {
             _userRepository = userRepository;
         }
-        
+
         [HttpGet]
         [Authorize(Roles = "admin")]
         public async Task<ActionResult<IEnumerable<User>>> Get()
@@ -27,6 +27,7 @@ namespace ApiAuth.Controllers
 
             return Ok(await _userRepository.Get());
         }
+
 
         [HttpGet("{id}")]
         [Authorize(Roles = "user")]
@@ -39,11 +40,13 @@ namespace ApiAuth.Controllers
             return Ok(user);
         }
 
-        [HttpGet("GetByName/{name}")]
+
+        [HttpGet("GetCurrentUser")]
         [Authorize]
-        public async Task<ActionResult<User>> GetByName(string name)
+        public async Task<ActionResult<User>> GetCurrentUser()
         {
-            var user = await _userRepository.GetByUsername(name);
+            var username = User.Identity.Name;
+            var user = await _userRepository.GetByUsername(username);
             if (user == null)
                 return NotFound();
 
