@@ -8,9 +8,9 @@ namespace ApiAuth.Filters
 {
     public class AuthorizationFilter : IAsyncAuthorizationFilter
     {
-        private readonly UserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public AuthorizationFilter(UserRepository userRepository)
+        public AuthorizationFilter(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
@@ -52,7 +52,6 @@ namespace ApiAuth.Filters
 
             // No controller já conseguimos identificar o usuário que está fazendo a requisição, através do User.Identity.Name.
             // Porém, podemos também consultar a base de dados e enriquecer as informações do usuário no contexto da requisição. Ex:
-
             var user = await _userRepository.GetByUsername(contextUser.Identity?.Name ?? throw new Exception("User.Identity.Name is null"));
 
             if (user != null)

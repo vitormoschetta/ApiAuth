@@ -2,7 +2,7 @@ using ApiAuth.Models;
 
 namespace ApiAuth.Data.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
         private List<User> _users = new List<User>();
 
