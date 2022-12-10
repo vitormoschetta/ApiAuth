@@ -42,8 +42,16 @@ namespace ApiAuth.Controllers
         [Authorize]
         public async Task<ActionResult<User>> GetCurrentUser()
         {
-            var username = User.Identity?.Name ?? throw new Exception("User.Identity.Name is null");
-            var user = await _userRepository.GetByUsername(username);
+            // Como enriquecemos o contexto da requisição com o usuário, no AuthorizationFilter, podemos recuperar o usuário de duas formas:
+            // 1) Através do HttpContext.Items
+            // 2) Através do User.Identity.Name
+
+            // 1) Através do HttpContext.Items
+            var user = await GetCurrentUserByHttpContext();
+
+            // 2) Através do User.Identity.Name
+            // var user = await GetCurrentUserByUserIdentity();
+            
             if (user == null)
                 return NotFound();
 
@@ -71,6 +79,21 @@ namespace ApiAuth.Controllers
             await _userRepository.Create(user);
 
             return Ok(user);
+        }
+
+
+        private Task<User?> GetCurrentUserByHttpContext()
+        {
+            var user = HttpContext.Items["user"] as User ?? throw new Exception("User not found in HttpContext.Items");
+            return Task.FromResult(user) as Task<User?>;
+        }
+
+
+        private async Task<User?> GetCurrentUserByUserIdentity()
+        {
+            var username = User.Identity?.Name ?? throw new Exception("User.Identity.Name is null");
+            var user = await _userRepository.GetByUsername(username);
+            return user;
         }
     }
 }

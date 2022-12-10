@@ -19,29 +19,29 @@ namespace ApiAuth.Filters
         {
             // Verifica se a rota é pública (AllowAnonymous). Neste caso, não precisa validar o token.
             var endpoint = context.HttpContext.GetEndpoint();
-            var allowAnonymousAttributes = endpoint?.Metadata.GetOrderedMetadata<AllowAnonymousAttribute>();
-            if (allowAnonymousAttributes != null)
+            var allowAnonymousAttributes = endpoint?.Metadata.GetOrderedMetadata<AllowAnonymousAttribute>() ?? Array.Empty<AllowAnonymousAttribute>();
+            if (allowAnonymousAttributes.Any())
             {
                 await Task.CompletedTask;
                 return;
             }
 
             // Se a rota não for pública, verifica se o usuário está autenticado.
-            var user = context.HttpContext.User;
-            if (user.Identity == null || !user.Identity.IsAuthenticated)
+            var contextUser = context.HttpContext.User;
+            if (contextUser.Identity == null || !contextUser.Identity.IsAuthenticated)
             {
                 context.Result = new UnauthorizedResult();
                 return;
             }
 
             // Verifica se o usuário tem permissão para acessar a rota.
-            var authorizeAttributes = endpoint?.Metadata.GetOrderedMetadata<AuthorizeAttribute>();
-            if (authorizeAttributes != null)
+            var authorizeAttributes = endpoint?.Metadata.GetOrderedMetadata<AuthorizeAttribute>() ?? Array.Empty<AuthorizeAttribute>();
+            if (authorizeAttributes.Any())
             {
                 var roles = authorizeAttributes.SelectMany(x => x.Roles?.Split(",").Select(y => y.Trim()) ?? Array.Empty<string>()).ToList();
                 if (roles.Any())
                 {
-                    var userRoles = user.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
+                    var userRoles = contextUser.Claims.Where(x => x.Type == ClaimTypes.Role).Select(x => x.Value).ToList();
                     if (!userRoles.Any(x => roles.Contains(x)))
                     {
                         context.Result = new ForbidResult();
@@ -50,8 +50,15 @@ namespace ApiAuth.Filters
                 }
             }
 
-            // aqui poderíamos fazer outras validações, como por exemplo, se o usuário está ativo ou não
-            // poderíamos também enriquecer o usuário com outras informações, como por exemplo, o perfil dele e passar para o controller. Ex: context.HttpContext.Items.Add("user", user)            
+            // No controller já conseguimos identificar o usuário que está fazendo a requisição, através do User.Identity.Name.
+            // Porém, podemos também consultar a base de dados e enriquecer as informações do usuário no contexto da requisição. Ex:
+
+            var user = await _userRepository.GetByUsername(contextUser.Identity?.Name ?? throw new Exception("User.Identity.Name is null"));
+
+            if (user != null)
+            {
+                context.HttpContext.Items.Add("user", user);
+            }          
 
             await Task.CompletedTask;
         }
