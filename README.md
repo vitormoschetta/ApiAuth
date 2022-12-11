@@ -16,11 +16,18 @@ A chave para gerar o token JWT é gerada a partir de um arquivo de configuraçã
 }
 ```
 
+
+### Adicionar arquivo de configuração
+
+Crie um arquivo `appsettings.json` com a mesma estrutura do arquivo `appsettings.json.example` em `./src/ApiAuth/`. 
+
+
 ### Executar Testes
 
 ```bash
 dotnet test
 ```
+
 
 ### Executar Aplicação
 
@@ -28,9 +35,8 @@ dotnet test
 dotnet run --project ./src/ApiAuth/ApiAuth.csproj
 ```
 
-<br>
 
+### Envio de E-mail
 
-### Configurar SMTP do Gmail
-
-https://support.google.com/accounts/answer/185833?hl=en
+Para enviar e-mails, é necessário configurar o arquivo `appsettings.json` com as informações do servidor SMTP. Documentação de configuração SMTP do Gmail:  
+https://support.google.com/accounts/answer/185833?hl=en  

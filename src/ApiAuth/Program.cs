@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.Interfaces;
 using Shared.Services;
+using Shared.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +15,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IUserRepository, UserRepository>();
-builder.Services.AddSingleton<JwtService>();
+builder.Services.Configure<AppSettings>(builder.Configuration);
 
+builder.Services.AddSingleton<IUserRepository, UserRepository>();
+
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 SwaggerConfig();
@@ -85,7 +88,7 @@ void SwaggerConfig()
 
 void AuthenticationConfig()
 {
-    var jwtKey = builder?.Configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key");
+    var jwtKey = builder?.Configuration["JwtConfig:Secret"] ?? throw new ArgumentNullException("JwtConfig:Secret");
     var key = Encoding.ASCII.GetBytes(jwtKey);
     builder.Services.AddAuthentication(options =>
         {

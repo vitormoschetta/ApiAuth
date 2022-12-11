@@ -3,6 +3,7 @@ using ApiAuth.Requests;
 using ApiAuth.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Interfaces;
 using Shared.Services;
 using Shared.Utils;
 
@@ -13,10 +14,10 @@ namespace ApiAuth.Controllers
     [AllowAnonymous]
     public class AuthController : ControllerBase
     {
-        private readonly JwtService _jwtServices;
+        private readonly IJwtService _jwtServices;
         private readonly IUserRepository _userRepository;
 
-        public AuthController(JwtService jwtServices, IUserRepository userRepository)
+        public AuthController(IJwtService jwtServices, IUserRepository userRepository)
         {
             _jwtServices = jwtServices;
             _userRepository = userRepository;

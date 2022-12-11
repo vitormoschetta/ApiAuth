@@ -3,7 +3,9 @@ using ApiAuth.Models;
 using ApiAuth.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Shared.Interfaces;
+using Shared.Settings;
 using Shared.Utils;
 
 namespace ApiAuth.Controllers
@@ -14,12 +16,14 @@ namespace ApiAuth.Controllers
     {
         private readonly IUserRepository _userRepository;
         private readonly IEmailService _emailService;
+        private readonly IOptions<AppSettings> _appSettings;
 
-        public UserController(IUserRepository userRepository, IEmailService emailService)
+        public UserController(IUserRepository userRepository, IEmailService emailService, IOptions<AppSettings> appSettings)
         {
             _userRepository = userRepository;
             _emailService = emailService;
-        }      
+            _appSettings = appSettings;
+        }
 
         [HttpGet]
         [Authorize(Roles = "admin")]
@@ -54,7 +58,7 @@ namespace ApiAuth.Controllers
 
             // 2) Através do User.Identity.Name
             // var user = await GetCurrentUserByUserIdentity();
-            
+
             if (user == null)
                 return NotFound();
 
@@ -81,7 +85,10 @@ namespace ApiAuth.Controllers
 
             await _userRepository.Create(user);
 
-            await _emailService.SendEmail(user.Email, "Welcome", "Welcome to our platform");
+            if (_appSettings.Value.SmtpConfig.Enabled)
+            {
+                await _emailService.SendEmail(user.Email, "Welcome", "Welcome to our platform");
+            }
 
             return Ok(user);
         }
