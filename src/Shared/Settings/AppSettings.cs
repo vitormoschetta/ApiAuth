@@ -2,6 +2,7 @@ namespace Shared.Settings
 {
     public class AppSettings
     {
+        public string BaseAddress { get; set; } = string.Empty;
         public JwtConfig JwtConfig { get; set; } = new JwtConfig();
         public SmtpConfig SmtpConfig { get; set; } = new SmtpConfig();
     }

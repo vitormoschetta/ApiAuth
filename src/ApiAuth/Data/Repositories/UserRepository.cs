@@ -12,6 +12,13 @@ namespace ApiAuth.Data.Repositories
             return Task.CompletedTask;
         }
 
+        public Task Update(User user)
+        {
+            var index = _users.FindIndex(x => x.Id == user.Id);
+            _users[index] = user;
+            return Task.CompletedTask;
+        }
+
         public Task<IEnumerable<User>> Get()
         {
             return Task.FromResult(_users.AsEnumerable());

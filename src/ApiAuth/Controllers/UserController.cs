@@ -86,8 +86,15 @@ namespace ApiAuth.Controllers
             await _userRepository.Create(user);
 
             if (_appSettings.Value.SmtpConfig.Enabled)
-            {
-                await _emailService.SendEmail(user.Email, "Welcome", "Welcome to our platform");
+            {                
+                var body = $@"
+                    <h1>Welcome to our platform</h1>
+                    <p>Username: {user.Username}</p>
+                    <p>Email: {user.Email}</p>
+
+                    <p>Click <a href='{_appSettings.Value.BaseAddress}/api/Auth/EmailVerification/{user.Id}'>here</a> to validate your email</p>";
+
+                await _emailService.SendEmail(user.Email, "Welcome", body);
             }
 
             return Ok(user);

@@ -1,11 +1,11 @@
 using System.Text;
 using ApiAuth.Data.Repositories;
 using ApiAuth.Filters;
-using ApiAuth.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.Interfaces;
+using Shared.Middlewares;
 using Shared.Services;
 using Shared.Settings;
 

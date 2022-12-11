@@ -4,7 +4,6 @@ using ApiAuth.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Interfaces;
-using Shared.Services;
 using Shared.Utils;
 
 namespace ApiAuth.Controllers
@@ -23,7 +22,7 @@ namespace ApiAuth.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
         {
             var user = await _userRepository.GetByUsername(request.Username);
@@ -45,6 +44,27 @@ namespace ApiAuth.Controllers
                 Email = user.Email,
                 Token = token
             });
+        }
+
+        [HttpGet("EmailVerification/{id}")]
+        public async Task<ContentResult> Confirm(Guid id)
+        {
+            var user = await _userRepository.GetById(id);
+            if (user == null)
+                return new ContentResult 
+            {
+                ContentType = "text/html",
+                Content = $"<div style='text-align:center; margin-top:3em; color:#808080'><h1>Usuario nao ncontrado</h1></div>"
+            };   
+
+            user.IsEmailVerified = true;
+            await _userRepository.Update(user);
+
+            return new ContentResult 
+            {
+                ContentType = "text/html",
+                Content = $"<div style='text-align:center; margin-top:3em; color:#808080'><h1>Email verificado com sucesso</h1></div>"
+            };            
         }
     }
 }
