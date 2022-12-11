@@ -6,11 +6,11 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Shared.Services
 {
-    public class JwtServices
+    public class JwtService
     {
         private readonly string _jwtKey;
 
-        public JwtServices(IConfiguration configuration)
+        public JwtService(IConfiguration configuration)
         {
             _jwtKey = configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key");
         }

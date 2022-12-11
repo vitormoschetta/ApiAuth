@@ -3,6 +3,7 @@ using ApiAuth.Models;
 using ApiAuth.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Interfaces;
 using Shared.Utils;
 
 namespace ApiAuth.Controllers
@@ -12,11 +13,13 @@ namespace ApiAuth.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IEmailService _emailService;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, IEmailService emailService)
         {
             _userRepository = userRepository;
-        }
+            _emailService = emailService;
+        }      
 
         [HttpGet]
         [Authorize(Roles = "admin")]
@@ -77,6 +80,8 @@ namespace ApiAuth.Controllers
             user.Password = HashManager.GenerateHash(request.Password, user.Salt);
 
             await _userRepository.Create(user);
+
+            await _emailService.SendEmail(user.Email, "Welcome", "Welcome to our platform");
 
             return Ok(user);
         }

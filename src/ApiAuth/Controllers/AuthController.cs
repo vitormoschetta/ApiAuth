@@ -13,10 +13,10 @@ namespace ApiAuth.Controllers
     [AllowAnonymous]
     public class AuthController : ControllerBase
     {
-        private readonly JwtServices _jwtServices;
+        private readonly JwtService _jwtServices;
         private readonly IUserRepository _userRepository;
 
-        public AuthController(JwtServices jwtServices, IUserRepository userRepository)
+        public AuthController(JwtService jwtServices, IUserRepository userRepository)
         {
             _jwtServices = jwtServices;
             _userRepository = userRepository;

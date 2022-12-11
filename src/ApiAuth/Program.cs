@@ -5,6 +5,7 @@ using ApiAuth.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Shared.Interfaces;
 using Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +15,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IUserRepository, UserRepository>();
-builder.Services.AddSingleton<JwtServices>();
+builder.Services.AddSingleton<JwtService>();
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 SwaggerConfig();
 AuthenticationConfig();

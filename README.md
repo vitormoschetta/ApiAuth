@@ -28,3 +28,9 @@ dotnet test
 dotnet run --project ./src/ApiAuth/ApiAuth.csproj
 ```
 
+<br>
+
+
+### Configurar SMTP do Gmail
+
+https://support.google.com/accounts/answer/185833?hl=en
