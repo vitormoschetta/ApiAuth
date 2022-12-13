@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ApiAuth.Filters
 {
+    /// <summary>
+    /// Filtro de autorização.
+    /// Esse filtro não é necessário, pois o próprio framework com a biblioteca Microsoft.AspNetCore.Authentication.JwtBearer já faz a validação do token.
+    /// Adicionamos ele apenas para enriquecer o contexto da requisição com informações do usuário.
+    /// </summary>
     public class AuthorizationFilter : IAsyncAuthorizationFilter
     {
         private readonly IUserRepository _userRepository;

@@ -25,6 +25,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 SwaggerConfig();
 AuthenticationConfig();
 
+// Esse filtro não é necessário, pois o próprio framework com a biblioteca Microsoft.AspNetCore.Authentication.JwtBearer já faz a validação do token, expiração, roles, etc.
+// Adicionamos ele apenas para enriquecer o contexto da requisição com informações do usuário.
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<AuthorizationFilter>();
@@ -104,7 +106,8 @@ void AuthenticationConfig()
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = false,
-                ValidateAudience = false
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
             };
         });
 }

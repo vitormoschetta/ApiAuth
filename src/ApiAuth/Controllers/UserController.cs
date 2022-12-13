@@ -50,14 +50,14 @@ namespace ApiAuth.Controllers
         public async Task<ActionResult<User>> GetCurrentUser()
         {
             // Como enriquecemos o contexto da requisição com o usuário, no AuthorizationFilter, podemos recuperar o usuário de duas formas:
-            // 1) Através do HttpContext.Items
-            // 2) Através do User.Identity.Name
+            // 1) Através do User.Identity.Name
+            // 2) Através do HttpContext.Items (Informações adicionais que podem ser adicionadas ao contexto da requisição ao utilizar um filtro de autorização)
 
-            // 1) Através do HttpContext.Items
-            var user = await GetCurrentUserByHttpContext();
+            // 1) Através do User.Identity.Name
+            var user = await GetCurrentUserByUserIdentity();
 
-            // 2) Através do User.Identity.Name
-            // var user = await GetCurrentUserByUserIdentity();
+            // 2) Através do HttpContext.Items
+            // var user = await GetCurrentUserByHttpContext();        
 
             if (user == null)
                 return NotFound();
@@ -86,7 +86,7 @@ namespace ApiAuth.Controllers
             await _userRepository.Create(user);
 
             if (_appSettings.Value.SmtpConfig.Enabled)
-            {                
+            {
                 var body = $@"
                     <h1>Welcome to our platform</h1>
                     <p>Username: {user.Username}</p>
