@@ -29,7 +29,8 @@ namespace Shared.Services
                 {
                     new Claim(ClaimTypes.Name, username),
                     new Claim(ClaimTypes.Email, email),
-                    new Claim(ClaimTypes.Role, role)
+                    new Claim(ClaimTypes.Role, role),
+                    new Claim("document", "932874")
                 })
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

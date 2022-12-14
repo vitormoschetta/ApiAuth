@@ -53,7 +53,11 @@ namespace ApiAuth.Filters
                         return;
                     }
                 }
-            }
+            }    
+
+            // Coleta um claim customizada do usuário e adiciona no contexto da requisição.
+            var document = contextUser.Claims.FirstOrDefault(x => x.Type == "document")?.Value;
+            context.HttpContext.Items.Add("document", document);
 
             // No controller já conseguimos identificar o usuário que está fazendo a requisição, através do User.Identity.Name.
             // Porém, podemos também consultar a base de dados e enriquecer as informações do usuário no contexto da requisição. Ex:

@@ -104,6 +104,8 @@ namespace ApiAuth.Controllers
         private Task<User?> GetCurrentUserByHttpContext()
         {
             var user = HttpContext.Items["user"] as User ?? throw new Exception("User not found in HttpContext.Items");
+            var document = HttpContext.Items["document"] as string ?? throw new Exception("Document not found in HttpContext.Items");
+            Console.WriteLine($"Document: {document}");
             return Task.FromResult(user) as Task<User?>;
         }
 
