@@ -1,29 +1,21 @@
 using ApiAuth.Data.Repositories;
 using ApiAuth.Models;
-using ApiAuth.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Shared.Interfaces;
-using Shared.Settings;
-using Shared.Utils;
 
 namespace ApiAuth.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
-        private readonly IEmailService _emailService;
-        private readonly IOptions<AppSettings> _appSettings;
 
-        public UserController(IUserRepository userRepository, IEmailService emailService, IOptions<AppSettings> appSettings)
+        public UsersController(IUserRepository userRepository)
         {
             _userRepository = userRepository;
-            _emailService = emailService;
-            _appSettings = appSettings;
         }
+
 
         [HttpGet]
         [Authorize(Roles = "admin")]
@@ -57,7 +49,7 @@ namespace ApiAuth.Controllers
             var user = await GetCurrentUserByUserIdentity();
 
             // 2) Através do HttpContext.Items
-            // var user = await GetCurrentUserByHttpContext();        
+            // var user = await GetCurrentUserByHttpContext();
 
             if (user == null)
                 return NotFound();
@@ -66,46 +58,9 @@ namespace ApiAuth.Controllers
         }
 
 
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<ActionResult<User>> Create([FromBody] CreateUserRequest request)
-        {
-            var userExists = await _userRepository.GetByUsername(request.Username);
-            if (userExists != null)
-                return BadRequest("Username already exists");
-
-            var user = new User
-            {
-                Username = request.Username,
-                Email = request.Email,
-                Role = request.Role
-            };
-
-            user.Password = HashManager.GenerateHash(request.Password, user.Salt);
-
-            await _userRepository.Create(user);
-
-            if (_appSettings.Value.SmtpConfig.Enabled)
-            {
-                var body = $@"
-                    <h1>Welcome to our platform</h1>
-                    <p>Username: {user.Username}</p>
-                    <p>Email: {user.Email}</p>
-
-                    <p>Click <a href='{_appSettings.Value.BaseAddress}/api/Auth/EmailVerification/{user.Id}'>here</a> to validate your email</p>";
-
-                await _emailService.SendEmail(user.Email, "Welcome", body);
-            }
-
-            return Ok(user);
-        }
-
-
         private Task<User?> GetCurrentUserByHttpContext()
         {
             var user = HttpContext.Items["user"] as User ?? throw new Exception("User not found in HttpContext.Items");
-            var document = HttpContext.Items["document"] as string ?? throw new Exception("Document not found in HttpContext.Items");
-            Console.WriteLine($"Document: {document}");
             return Task.FromResult(user) as Task<User?>;
         }
 
@@ -113,8 +68,13 @@ namespace ApiAuth.Controllers
         private async Task<User?> GetCurrentUserByUserIdentity()
         {
             var username = User.Identity?.Name ?? throw new Exception("User.Identity.Name is null");
-            var user = await _userRepository.GetByUsername(username);
-            return user;
+
+            // pegar valor de um claim específico
+            var document = User.Claims.FirstOrDefault(x => x.Type == "document")?.Value;
+            if (document != null)
+                Console.WriteLine($"Document: {document}");
+
+            return await _userRepository.GetByUsername(username);
         }
     }
 }

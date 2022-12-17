@@ -12,6 +12,9 @@ namespace ApiAuth.Models
         public string Role { get; set; } = string.Empty;
 
         [JsonIgnore]
+        public string RefreshToken { get; set; } = string.Empty;
+
+        [JsonIgnore]
         public string Password { get; set; } = string.Empty;
 
         [JsonIgnore]

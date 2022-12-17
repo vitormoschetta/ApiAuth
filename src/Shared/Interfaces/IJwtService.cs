@@ -1,7 +1,11 @@
+using System.Security.Claims;
+
 namespace Shared.Interfaces
 {
     public interface IJwtService
     {
-        Task<string> GenerateJwtToken(string username, string role, string email);
+        Task<string> GenerateJwtToken(Claim[] claims);
+        Task<string> GenerateRefreshToken();
+        Task<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token);
     }
 }

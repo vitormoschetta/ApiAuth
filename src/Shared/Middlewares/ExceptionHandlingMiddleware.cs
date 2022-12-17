@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Shared.Middlewares
 {
@@ -32,10 +33,23 @@ namespace Shared.Middlewares
         {
             _logger.LogError(exception, exception.Message);
 
+            var code = HttpStatusCode.InternalServerError;
+
+            switch (exception)
+            {
+                case UnauthorizedAccessException:
+                case SecurityTokenException:
+                    code = HttpStatusCode.Unauthorized;
+                    break;
+                default:
+                    code = HttpStatusCode.InternalServerError;
+                    break;
+            }
+
             var result = JsonSerializer.Serialize(new { error = exception.Message });
 
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError; ;
+            context.Response.StatusCode = (int)code;
             return context.Response.WriteAsync(result);
         }
     }
