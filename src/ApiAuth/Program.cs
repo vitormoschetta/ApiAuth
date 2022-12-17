@@ -2,6 +2,7 @@ using System.Text;
 using ApiAuth.Data.Repositories;
 using ApiAuth.Filters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Shared.Interfaces;
@@ -90,7 +91,9 @@ void SwaggerConfig()
 
 void AuthenticationConfig()
 {
-    var jwtKey = builder?.Configuration["JwtConfig:Secret"] ?? throw new ArgumentNullException("JwtConfig:Secret");
+    var appSettings = builder?.Services?.BuildServiceProvider()?.GetService<IOptions<AppSettings>>()?.Value ?? throw new ArgumentNullException(nameof(AppSettings));
+
+    var jwtKey = appSettings.JwtConfig.Secret;
     var key = Encoding.ASCII.GetBytes(jwtKey);
     builder.Services.AddAuthentication(options =>
         {
@@ -99,15 +102,17 @@ void AuthenticationConfig()
         })
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false;
-            options.SaveToken = true;
+            options.RequireHttpsMetadata = appSettings.JwtConfig.RequireHttpsMetadata;
+            options.SaveToken = appSettings.JwtConfig.SaveToken;
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateLifetime = true,
+                ValidateIssuerSigningKey = appSettings.JwtConfig.ValidateIssuerSigningKey,
+                ValidateLifetime = appSettings.JwtConfig.ValidateLifetime,
+                ValidateIssuer = appSettings.JwtConfig.ValidateIssuer,
+                ValidIssuer = appSettings.JwtConfig.Issuer,
+                ValidateAudience = appSettings.JwtConfig.ValidateAudience,
+                ValidAudience = appSettings.JwtConfig.Audience,
                 ClockSkew = TimeSpan.Zero
             };
         });

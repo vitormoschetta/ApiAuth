@@ -102,7 +102,7 @@ namespace ApiAuth.Controllers
 
             var user = await _userRepository.GetByUsername(username);
             if (user == null)
-                return Unauthorized (new { message = "Invalid token: user not found" });
+                return Unauthorized(new { message = "Invalid token: user not found" });
 
             if (user.RefreshToken != request.RefreshToken)
                 return Unauthorized(new { message = "Invalid refresh token" });
@@ -156,7 +156,9 @@ namespace ApiAuth.Controllers
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.Role, user.Role),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim("document", "123456789") // custom claim
+                new Claim("iss", _appSettings.Value.JwtConfig.Issuer),
+                new Claim("aud", _appSettings.Value.JwtConfig.Audience),
+                new Claim("document", "123456789") // custom claim,
             };
         }
     }

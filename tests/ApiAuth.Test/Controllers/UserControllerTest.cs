@@ -28,7 +28,7 @@ namespace ApiAuth.Test.Controllers
             await Login("admin", "admin");
 
             // Act
-            var response = await _client.GetAsync("/api/user");
+            var response = await _client.GetAsync("/api/users");
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -55,7 +55,7 @@ namespace ApiAuth.Test.Controllers
             await Login("user", "user");
 
             // Act
-            var response = await _client.GetAsync("/api/user/current");
+            var response = await _client.GetAsync("/api/users/current");
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -78,7 +78,7 @@ namespace ApiAuth.Test.Controllers
             await Login("user", "user");
 
             // Act
-            var response = await _client.GetAsync($"/api/user/{username}");
+            var response = await _client.GetAsync($"/api/users/{username}");
 
             // Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -100,7 +100,7 @@ namespace ApiAuth.Test.Controllers
             await Login("user", "user");
 
             // Act
-            var response = await _client.GetAsync("/api/user");
+            var response = await _client.GetAsync("/api/users");
 
             // Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -118,7 +118,7 @@ namespace ApiAuth.Test.Controllers
             };
 
             var content = new StringContent(JsonConvert.SerializeObject(createUserRequest), Encoding.UTF8, "application/json");
-            var response = await _client.PostAsync("/api/user", content);
+            var response = await _client.PostAsync("/api/auth/register", content);
             response.EnsureSuccessStatusCode();
         }
 

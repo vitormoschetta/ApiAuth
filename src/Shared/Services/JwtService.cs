@@ -23,8 +23,8 @@ namespace Shared.Services
 
         public Task<string> GenerateJwtToken(Claim[] claims)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Value.JwtConfig.Secret);
+            var tokenHandler = new JwtSecurityTokenHandler();            
             var tokenDescriptor = new SecurityTokenDescriptor();
             tokenDescriptor.SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
             tokenDescriptor.Subject = new ClaimsIdentity(claims);
@@ -43,13 +43,15 @@ namespace Shared.Services
 
         public Task<ClaimsPrincipal> GetPrincipalFromExpiredToken(string token)
         {
+            var key = Encoding.ASCII.GetBytes(_appSettings.Value.JwtConfig.Secret);
             var tokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false,
-                ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_appSettings.Value.JwtConfig.Secret)),
-                ValidateLifetime = false
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateLifetime = false, // esse token está expirado, então não vamos validar a data de expiração
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
