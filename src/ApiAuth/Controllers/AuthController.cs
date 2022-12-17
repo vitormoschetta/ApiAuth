@@ -79,6 +79,9 @@ namespace ApiAuth.Controllers
             if (user.Password != passwordHash)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
+            if (!user.IsEmailVerified && _appSettings.Value.SmtpConfig.Enabled)
+                return BadRequest(new { message = "Email not verified" });
+
             var claims = GetClaims(user);
             var token = await _jwtServices.GenerateJwtToken(claims);
 
